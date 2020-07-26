@@ -52,6 +52,9 @@ def send_inline_beer(bot, message):
 
 def choose_number_of_beer(bot, query):
     keyboard = telebot.types.InlineKeyboardMarkup()
+    if query.message.from_user.username not in config.trust_list:
+        bot.send_message(query.message.chat.id, "У Вас нет прав на добавление")
+        return
 
     for item in config.numbers:
         keyboard.row(
@@ -76,10 +79,16 @@ def add_beer(bot, query):
         bot.send_message(query.message.chat.id, "Ошибка! Человек который накосячил не выбран!")
         return
 
+    if query.message.from_user.username not in config.trust_list:
+        bot.send_message(query.message.chat.id, "У Вас нет прав на добавление")
+        return
+
     beers[config.NAME] += int(query.data)
+
     if beers[config.NAME] < 0:
         beers[config.NAME] = 0
         bot.send_message(query.message.chat.id, 'Не пытайтесь понизить пиво меньше 0!')
+
     config.save_beer_list(beers)
 
     if config.LAST_REPLY_MESSAGE is not None:
