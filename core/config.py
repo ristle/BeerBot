@@ -8,7 +8,7 @@ ADD_PERSON=False
 TIMEZONE = 'Europe/Moscow'
 TIMEZONE_COMMON_NAME = 'Moscow'
 
-numbers = [1, 2, 3, 5, 10]
+numbers = [-1, 1, 2, 3, 5, 10]
 trust_list = ['ristleell', 'Barzello', 'ra3vld']
 girls = ['Тома', 'Соня']
 
