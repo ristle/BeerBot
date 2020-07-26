@@ -24,7 +24,7 @@ def send_list(bot, message):
             else:
                 text += NAME + " мало косячик, хотя должен уже " + str(iter) + ". Стоит призадуматься) \n\n"
         else:
-            text += NAME + " паянька и не должен ничего\n\n"
+            text += NAME + " паинька и не должен ничего\n\n"
     bot.send_message(message.chat.id, text)
     config.LAST_REPLY_MESSAGE = None
 
@@ -77,6 +77,9 @@ def add_beer(bot, query):
         return
 
     beers[config.NAME] += int(query.data)
+    if beers[config.NAME] < 0:
+        beers[config.NAME] = 0
+        bot.send_message(query.message.chat.id, 'Не пытайтесь понизить пиво меньше 0!')
     config.save_beer_list(beers)
 
     if config.LAST_REPLY_MESSAGE is not None:
