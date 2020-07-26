@@ -83,6 +83,9 @@ def iq_callback(query):
         func.send_list(bot, query)
     elif query.data == 'Добавить':
         config.NAME = None
+        if query.message.from_user.username not in config.trust_list:
+            bot.send_message(query.message.chat.id, "У Вас нет прав на добавление")
+            return
         func.send_inline_beer(bot, query.message)
     elif query.data in list(beers.keys()):
         config.NAME = query.data
