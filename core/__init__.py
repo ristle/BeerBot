@@ -7,17 +7,17 @@ import func
 bot = telebot.TeleBot(config.TOKEN)
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['beer_s'])
 def start_command(message):
     bot.send_message(
         message.chat.id,
         'Шалом, я предназначен для того, чтобы смотреть кто сколько пива должен\n' +
-        'Если есть тувые вопросы, то напишите /help.'
+        'Если есть вопросы, то напишите /help.'
     )
 
 
 # for stupid
-@bot.message_handler(commands=['help'])
+@bot.message_handler(commands=['beer_h'])
 def help_command(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
     keyboard.add(
@@ -25,19 +25,27 @@ def help_command(message):
             'message to developer', url='t.me/ristleell'
         )
     )
+    keyboard.add(
+        telebot.types.InlineKeyboardButton(
+            'GitHub', url='https://github.com/ristle/BeerBot.git'
+        )
+    )
     bot.send_message(
         message.chat.id,
-        '1) Для того, чтобы начать напишите: /main.\n' +
-        '2) Нажминте на кого хотите\n' +
-        '3) нажмите на количесво пива\n' +
-        '4) Для того, чтобы добавить пиво на счет можете также написать /add\n' +
-        '5) Можно добавить нового члоевека через /add (последняя кнопка\n',
+        '1) Для того, чтобы начать напишите: /beer_m ' +
+        'и нажмите на желаемое действие\n' +
+        '2) Если вы выбрали "Добавить", то далее нажмите на нужного человека\n' +
+        '3) Нажмите на количество пива\n' +
+        '4) Для того, чтобы сразу добавить пиво на счет можете также написать /beer_a\n' +
+        '5) Можно добавить нового человека через /beer_a (последняя кнопка\n' +
+        '6) Для просмотра списка должников можно сразу написать /beer_l\n' +
+        '7) Ссылка на исходники : https://github.com/ristle/BeerBot.git',
         reply_markup=keyboard
     )
 
 
 # /main function for lazy people
-@bot.message_handler(commands=['main'])
+@bot.message_handler(commands=['beer_m'])
 def exchange_command(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
     keyboard.row(
@@ -57,7 +65,7 @@ def exchange_command(message):
 
 
 # needed for one line adding new beer
-@bot.message_handler(commands=['add'])
+@bot.message_handler(commands=['beer_a'])
 def exchange_command(message):
     config.NAME = None
     if message.from_user.username not in config.trust_list:
@@ -67,7 +75,7 @@ def exchange_command(message):
 
 
 # needed for sending list by typing one command
-@bot.message_handler(commands=['list'])
+@bot.message_handler(commands=['beer_l'])
 def exchange_command(message):
     config.NAME = None
     func.send_list(bot, message)
@@ -80,7 +88,7 @@ def iq_callback(query):
 
     if query.data == 'Список':
         config.NAME = None
-        func.send_list(bot, query)
+        func.send_list(bot, query.message)
     elif query.data == 'Добавить':
         config.NAME = None
         if query.message.from_user.username not in config.trust_list:

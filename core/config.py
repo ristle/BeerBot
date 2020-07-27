@@ -9,7 +9,7 @@ TIMEZONE = 'Europe/Moscow'
 TIMEZONE_COMMON_NAME = 'Moscow'
 
 numbers = [-1, 1, 2, 3, 5, 10]
-trust_list = ['ristleell', 'Barzello', 'ra3vld']
+trust_list = ['ristleell', 'Barzello', 'ra3vld', 'Agamayunov']
 girls = ['Тома', 'Соня']
 
 with open('key.txt', 'r') as file:

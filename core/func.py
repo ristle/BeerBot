@@ -24,7 +24,10 @@ def send_list(bot, message):
             else:
                 text += NAME + " мало косячик, хотя должен уже " + str(iter) + ". Стоит призадуматься) \n\n"
         else:
-            text += NAME + " паинька и не должен ничего\n\n"
+            if NAME in config.girls:
+                text += NAME + " паинька и не должна ничего фиии\n\n"
+            else:
+                text += NAME + " паинька и не должен ничего\n\n"
     bot.send_message(message.chat.id, text)
     config.LAST_REPLY_MESSAGE = None
 
@@ -32,6 +35,10 @@ def send_list(bot, message):
 def send_inline_beer(bot, message):
     keyboard = telebot.types.InlineKeyboardMarkup()
     beers = config.load_beer_list()
+
+    if message.from_user.username not in config.trust_list:
+        bot.send_message(message.chat.id, "У Вас нет прав на добавление")
+        return
 
     for NAME, iter in beers.items():
         keyboard.row(
@@ -52,7 +59,8 @@ def send_inline_beer(bot, message):
 
 def choose_number_of_beer(bot, query):
     keyboard = telebot.types.InlineKeyboardMarkup()
-    if query.message.from_user.username not in config.trust_list:
+
+    if query.from_user.username not in config.trust_list:
         bot.send_message(query.message.chat.id, "У Вас нет прав на добавление")
         return
 
@@ -114,11 +122,11 @@ def add_person(bot, query):
     beers = config.load_beer_list()
     beers[query.text] = 0
     try:
-        del beers['/main']
+        del beers['/beer_m']
     except:
         pass
     config.save_beer_list(beers)
 
-    bot.send_chat_action(query.message.chat.id, 'typing')
+    bot.send_chat_action(query.chat.id, 'typing')
     send_message_ = 'Человек добавлен. У него пока 0 пива на счету, если хотите это исправить, то введите комманду /add'
     bot.send_message(query.chat.id, send_message_)
