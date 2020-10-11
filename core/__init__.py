@@ -3,11 +3,12 @@ import telebot
 import telepot
 import config
 import func
+from loguru import logger
 
 bot = telebot.TeleBot(config.TOKEN)
+logger.add(".logger.log", format="{time} {level} {message}", rotation="50 MB") 
 
-
-@bot.message_handler(commands=['beer_s'])
+@bot.message_handler(commands=['start'])
 def start_command(message):
     bot.send_message(
         message.chat.id,
@@ -17,7 +18,7 @@ def start_command(message):
 
 
 # for stupid
-@bot.message_handler(commands=['beer_h'])
+@bot.message_handler(commands=['help'])
 def help_command(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
     keyboard.add(
@@ -32,20 +33,20 @@ def help_command(message):
     )
     bot.send_message(
         message.chat.id,
-        '1) Для того, чтобы начать напишите: /beer_m ' +
+        '1) Для того, чтобы начать напишите: /main ' +
         'и нажмите на желаемое действие\n' +
         '2) Если вы выбрали "Добавить", то далее нажмите на нужного человека\n' +
         '3) Нажмите на количество пива\n' +
-        '4) Для того, чтобы сразу добавить пиво на счет можете также написать /beer_a\n' +
-        '5) Можно добавить нового человека через /beer_a (последняя кнопка\n' +
-        '6) Для просмотра списка должников можно сразу написать /beer_l\n' +
+        '4) Для того, чтобы сразу добавить пиво на счет можете также написать /add\n' +
+        '5) Можно добавить нового человека через /add (последняя кнопка\n' +
+        '6) Для просмотра списка должников можно сразу написать /list\n' +
         '7) Ссылка на исходники : https://github.com/ristle/BeerBot.git',
         reply_markup=keyboard
     )
 
 
 # /main function for lazy people
-@bot.message_handler(commands=['beer_m'])
+@bot.message_handler(commands=['main'])
 def exchange_command(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
     keyboard.row(
@@ -65,7 +66,7 @@ def exchange_command(message):
 
 
 # needed for one line adding new beer
-@bot.message_handler(commands=['beer_a'])
+@bot.message_handler(commands=['add'])
 def exchange_command(message):
     config.NAME = None
     if message.from_user.username not in config.trust_list:
@@ -75,8 +76,9 @@ def exchange_command(message):
 
 
 # needed for sending list by typing one command
-@bot.message_handler(commands=['beer_l'])
+@bot.message_handler(commands=['list'])
 def exchange_command(message):
+    print(message.text)
     config.NAME = None
     func.send_list(bot, message)
 
@@ -105,9 +107,14 @@ def iq_callback(query):
         func.add_inline_person(bot, query.message)
 
 
+# add tasks for
+# @bot.add_message_handler()
+
+
 # add listener for simple telegram messages
 # needed for adding person
 def listener(messages):
+    print(messages)
     for m in messages:
         if config.LAST_REPLY_MESSAGE:
             config.ADD_PERSON = False

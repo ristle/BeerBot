@@ -1,11 +1,15 @@
+# -*- coding: utf-8 -*-
 import config
 import telebot
 import telepot
+from loguru import logger
 
-
+@logger.catch()
 def send_list(bot, message):
     text = str()
-
+    
+    logger.info("Got command from {}", message.from_user.username)
+    logger.info("Starting sendin list")
     bot.send_chat_action(message.chat.id, 'typing')
 
     if config.LAST_REPLY_MESSAGE is not None:
@@ -15,26 +19,29 @@ def send_list(bot, message):
     for NAME, iter in beers.items():
         if iter and iter < 10:
             if NAME in config.girls:
-                text += NAME + " должна уже " + str(iter) + ". Фииииии\n\n"
+                text += NAME + " должна уже " + str(iter) + ". Бе)\n"
             else:
-                text += NAME + " должен уже " + str(iter) + "\n\n"
+                text += NAME + " должен уже " + str(iter) + "\n"
         elif iter > 10:
             if NAME in config.girls:
-                text += NAME + " обнаглела и должна " + str(iter) + '. Фиииии\n\n'
+                text += NAME + " обнаглела и должна " + str(iter) + '. Фиииии\n'
             else:
-                text += NAME + " мало косячик, хотя должен уже " + str(iter) + ". Стоит призадуматься) \n\n"
+                text += NAME + " мало косячик, хотя должен уже " + str(iter) + ". Стоит призадуматься) \n"
         else:
             if NAME in config.girls:
-                text += NAME + " паинька и не должна ничего фиии\n\n"
+                text += NAME + " паинька и не должна ничего фи\n"
             else:
-                text += NAME + " паинька и не должен ничего\n\n"
+                text += NAME + " паинька и не должен ничего\n"
     bot.send_message(message.chat.id, text)
     config.LAST_REPLY_MESSAGE = None
 
 
+@logger.catch()
 def send_inline_beer(bot, message):
     keyboard = telebot.types.InlineKeyboardMarkup()
     beers = config.load_beer_list()
+    logger.info("Got command from {}", message.from_user.username)
+    logger.info("Starting addading a new person")
 
     if message.from_user.username not in config.trust_list:
         bot.send_message(message.chat.id, "У Вас нет прав на добавление")
@@ -57,6 +64,7 @@ def send_inline_beer(bot, message):
     config.LAST_REPLY_MESSAGE = msg.message_id
 
 
+@logger.catch()
 def choose_number_of_beer(bot, query):
     keyboard = telebot.types.InlineKeyboardMarkup()
 
@@ -80,14 +88,15 @@ def choose_number_of_beer(bot, query):
     msg = bot.send_message(query.message.chat.id, send_message_, reply_markup=keyboard)
     config.LAST_REPLY_MESSAGE = msg.message_id
 
-
+@logger.catch()
 def add_beer(bot, query):
     beers = config.load_beer_list()
     if config.NAME is None:
         bot.send_message(query.message.chat.id, "Ошибка! Человек который накосячил не выбран!")
         return
-
-    if query.message.from_user.username not in config.trust_list:
+    
+    if query.from_user.username not in config.trust_list:
+        logger.error("This person trying to access {}", query.from_user.username)
         bot.send_message(query.message.chat.id, "У Вас нет прав на добавление")
         return
 
@@ -108,8 +117,9 @@ def add_beer(bot, query):
     bot.send_message(query.message.chat.id, send_message_)
     config.LAST_REPLY_MESSAGE = None
 
-
+@logger.catch
 def add_inline_person(bot, message):
+    logger.info("Starting addading")
     if config.LAST_REPLY_MESSAGE is not None:
         bot.delete_message(message.chat.id, config.LAST_REPLY_MESSAGE)
 
@@ -117,7 +127,7 @@ def add_inline_person(bot, message):
     msg = bot.send_message(message.chat.id, send_message_)
     config.LAST_REPLY_MESSAGE = msg.message_id
 
-
+@logger.catch()
 def add_person(bot, query):
     beers = config.load_beer_list()
     beers[query.text] = 0
@@ -126,7 +136,8 @@ def add_person(bot, query):
     except:
         pass
     config.save_beer_list(beers)
-
+    
+    logger.info("Added {}", query.text)
     bot.send_chat_action(query.chat.id, 'typing')
     send_message_ = 'Человек добавлен. У него пока 0 пива на счету, если хотите это исправить, то введите комманду /add'
     bot.send_message(query.chat.id, send_message_)

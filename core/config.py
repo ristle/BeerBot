@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from loguru import logger
 
 NAME = None
 TOKEN = None
@@ -9,11 +10,12 @@ TIMEZONE = 'Europe/Moscow'
 TIMEZONE_COMMON_NAME = 'Moscow'
 
 numbers = [-1, 1, 2, 3, 5, 10]
-trust_list = ['ristleell', 'Barzello', 'ra3vld', 'Agamayunov']
+trust_list = ['ristleell', 'ristleell', 'Barzello', 'ra3vld', 'Agamayunov']
 girls = ['Тома', 'Соня']
 
-with open('key.txt', 'r') as file:
-    TOKEN = file.read()
+with open('key.json', encoding='utf-8') as key:
+    keys = json.load(key)
+    TOKEN = keys["telegram"]
 
 
 def load_beer_list():
