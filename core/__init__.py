@@ -6,7 +6,8 @@ import func
 from loguru import logger
 
 bot = telebot.TeleBot(config.TOKEN)
-logger.add(".logger.log", format="{time} {level} {message}", rotation="50 MB") 
+logger.add(".logger.log", format="{time} {level} {message}", rotation="50 MB")
+
 
 @bot.message_handler(commands=['start'])
 def start_command(message):
@@ -103,22 +104,44 @@ def iq_callback(query):
     elif query.data in [str(i) for i in config.numbers]:
         func.add_beer(bot, query)
     elif query.data == 'Other':
-        config.ADD_PERSON = True
-        func.add_inline_person(bot, query.message)
+        bot.send_message("**Error**",  parse_mode='Markdown')
 
 
-# add tasks for
-# @bot.add_message_handler()
+# needed for stopping useless bot while adding a new person
+@bot.message_handler(commands=['stop'])
+def exchange_command(message):
+    config.ADD_PERSON = False
+    config.REMOVE_PERSON = False
+
+    logger.debug("{}", message.text)
+    bot.send_message("Остановлено добавление бота")
+
+
+@bot.message_handler(commands=['delete'])
+def exchange_command(message):
+    logger.debug("{}", message.text)
+
+    config.NAME = None
+
+    if message.from_user.username not in config.trust_list:
+        bot.send_message(message.chat.id, "У Вас нет прав на добавление")
+        return
+
+    func.delete_inline_person(bot, message)
 
 
 # add listener for simple telegram messages
 # needed for adding person
 def listener(messages):
-    print(messages)
+    logger.debug("{}", messages)
     for m in messages:
         if config.LAST_REPLY_MESSAGE:
-            config.ADD_PERSON = False
-            func.add_person(bot, m)
+            if config.ADD_PERSON:
+                config.ADD_PERSON = False
+                func.add_person(bot, m)
+            elif config.REMOVE_PERSON:
+                config.REMOVE_PERSON = False
+                func.delete_person(bot, m)
 
 
 bot.set_update_listener(listener)
