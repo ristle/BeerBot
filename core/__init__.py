@@ -91,21 +91,33 @@ def iq_callback(query):
 
     if query.data == 'Список':
         config.NAME = None
+        config.ADD_PERSON = False
+        config.REMOVE_PERSON = False
         func.send_list(bot, query.message)
     elif query.data == 'Добавить':
         config.NAME = None
+        config.REMOVE_PERSON = False
         if query.message.from_user.username not in config.trust_list:
             bot.send_message(query.message.chat.id, "У Вас нет прав на добавление")
             return
         func.send_inline_beer(bot, query.message)
     elif query.data in list(beers.keys()):
         config.NAME = query.data
-        func.choose_number_of_beer(bot, query)
+        if config.REMOVE_PERSON:
+            config.ADD_PERSON = False
+            func.delete_person(bot, query.message)
+        else:
+            config.REMOVE_PERSON = False
+            func.choose_number_of_beer(bot, query)
     elif query.data in [str(i) for i in config.numbers]:
         func.add_beer(bot, query)
     elif query.data == 'Other':
-        config.ADD_PERSON = True
-        func.add_inline_person(bot, query.message)
+        if config.REMOVE_PERSON:
+            config.ADD_PERSON = False
+            func.delete_inline_person(bot, query.message)
+        else:
+            config.REMOVE_PERSON = False
+            func.add_inline_person(bot, query.message)
         # bot.send_message(query.message.chat.id, "**Error**",  parse_mode='Markdown')
 
 
@@ -116,18 +128,19 @@ def exchange_command(message):
     config.REMOVE_PERSON = False
 
     logger.debug("{}", message.text)
-    bot.send_message("Остановлено добавление бота")
+    bot.send_message(message.chat.id, "Остановлено добавление бота")
 
 
 @bot.message_handler(commands=['delete'])
 def exchange_command(message):
     logger.debug("{}", message.text)
 
-    config.NAME = None
-
     if message.from_user.username not in config.trust_list:
         bot.send_message(message.chat.id, "У Вас нет прав на добавление")
         return
+
+    config.REMOVE_PERSON = True
+    config.NAME = None
 
     func.delete_inline_person(bot, message)
 

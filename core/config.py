@@ -6,6 +6,7 @@ NAME = None
 TOKEN = None
 LAST_REPLY_MESSAGE = None
 ADD_PERSON = False
+REMOVE_PERSON = False
 TIMEZONE = 'Europe/Moscow'
 TIMEZONE_COMMON_NAME = 'Moscow'
 

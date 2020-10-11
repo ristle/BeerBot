@@ -31,6 +31,7 @@ def post_keyboard_action(bot, message, keyboard):
     bot.send_chat_action(message.chat.id, 'typing')
     if config.LAST_REPLY_MESSAGE is not None:
         bot.delete_message(message.chat.id, config.LAST_REPLY_MESSAGE)
+        config.LAST_REPLY_MESSAGE = None
 
     send_message_ = 'Выберите '
     msg = bot.send_message(message.chat.id, send_message_, reply_markup=keyboard, parse_mode='Markdown')
@@ -47,6 +48,7 @@ def send_list(bot, message):
 
     if config.LAST_REPLY_MESSAGE is not None:
         bot.delete_message(message.chat.id, config.LAST_REPLY_MESSAGE)
+        config.LAST_REPLY_MESSAGE = None
 
     beers = config.load_beer_list()
     for name_, iter in beers.items():
@@ -81,11 +83,7 @@ def send_inline_beer(bot, message):
 
 @logger.catch()
 def delete_inline_person(bot, message):
-    config.REMOVE_PERSON = True
     bot, keyboard = inline_keyboard(bot, message, " Staring inline keyboard deleting the person")
-    keyboard.row(
-        telebot.types.InlineKeyboardButton('УБАРТЬ Человека НАХУЙ\n AAAAAAA', callback_data='Other')
-    )
     post_keyboard_action(bot, message, keyboard)
 
 
@@ -107,6 +105,7 @@ def choose_number_of_beer(bot, query):
 
     if config.LAST_REPLY_MESSAGE is not None:
         bot.delete_message(query.message.chat.id, config.LAST_REPLY_MESSAGE)
+        config.LAST_REPLY_MESSAGE = None
 
     bot.send_chat_action(query.message.chat.id, 'typing')
     send_message_ = 'Выберите количество пиво для ' + config.NAME
@@ -136,6 +135,7 @@ def add_beer(bot, query):
 
     if config.LAST_REPLY_MESSAGE is not None:
         bot.delete_message(query.message.chat.id, config.LAST_REPLY_MESSAGE)
+        config.LAST_REPLY_MESSAGE = None
 
     send_message_ = 'Теперь у *' + config.NAME + '* должен __' + str(beers[config.NAME]) + \
                     '__ бутылок пива'
@@ -149,6 +149,7 @@ def add_inline_person(bot, message):
     logger.info("Starting adding")
     if config.LAST_REPLY_MESSAGE is not None:
         bot.delete_message(message.chat.id, config.LAST_REPLY_MESSAGE)
+        config.LAST_REPLY_MESSAGE = None
 
     send_message_ = 'Напишите имя человека '
     msg = bot.send_message(message.chat.id, send_message_, parse_mode='Markdown')
@@ -164,18 +165,32 @@ def add_person(bot, query):
 
     logger.info("Added {}", query.text)
     bot.send_chat_action(query.chat.id, 'typing')
-    send_message_ = 'Человек *добавлен*. У него пока _0_ пива на счету, если хотите это исправить, то введите ' \
-                    'комманду /add '
+    send_message_ = 'Человек {0} *добавлен*. У него пока _0_ пива на счету, если хотите это исправить, то введите ' \
+                    'комманду /add '.format(query.text)
     bot.send_message(query.chat.id, send_message_, parse_mode='Markdown')
 
 
 @logger.catch()
 def delete_person(bot, query):
+    if config.LAST_REPLY_MESSAGE:
+        try:
+            bot.delete_message(query.chat.id, config.LAST_REPLY_MESSAGE)
+            config.LAST_REPLY_MESSAGE = None
+        except Exception as ex:
+            logger.error(ex)
+    if not config.NAME:
+        logger.error("No name was provided")
+        # Ошибка работы бота - он не выходит отсюда и не понимает, что пора остановится
+        # bot.send_message(query.chat.id, "No *name* was provided! ", parse_mode='Markdown')
+        return
+
     beers = config.load_beer_list()
-    del beers[query.text]
+    del beers[config.NAME]
     config.save_beer_list(beers)
 
     logger.info("Added {}", query.text)
     bot.send_chat_action(query.chat.id, 'typing')
-    send_message_ = 'Человек *удален* '
+    send_message_ = 'Человек _{0}_ *удален* '.format(config.NAME)
     bot.send_message(query.chat.id, send_message_, parse_mode='Markdown')
+
+    config.NAME = None
