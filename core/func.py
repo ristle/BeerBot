@@ -60,12 +60,12 @@ def send_list(bot, message):
                 text += NAME + "* должен уже _" + str(iter) + "_\n"
         elif iter >= 10:
             if name_ in config.girls:
-                text += NAME + "* обнаглела и должна _" + str(iter) + '_. Фиииии\n'
+                text += NAME + "* обнаглела и должна _" + str(iter) + '_. Фи\n'
             else:
                 text += NAME + "* мало косячик, хотя должен уже _" + str(iter) + "_. Стоит призадуматься) \n"
         else:
             if name_ in config.girls:
-                text += NAME + "* паинька и не должна ничего _фи_\n"
+                text += NAME + "* паинька и не должна ничего\n"
             else:
                 text += NAME + "* паинька и не должен ничего\n"
     bot.send_message(message.chat.id, text, parse_mode='Markdown')

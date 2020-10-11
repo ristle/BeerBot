@@ -1,0 +1,9 @@
+aiohttp==3.6.2
+async-timeout==3.0.1
+attrs==20.2.0
+chardet==3.0.4
+loguru==0.5.3
+multidict==4.7.6
+pytelegrambotapi==3.6.6
+requests==2.24.0
+
