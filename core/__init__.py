@@ -104,7 +104,9 @@ def iq_callback(query):
     elif query.data in [str(i) for i in config.numbers]:
         func.add_beer(bot, query)
     elif query.data == 'Other':
-        bot.send_message(query.message.chat.id, "**Error**",  parse_mode='Markdown')
+        config.ADD_PERSON = True
+        func.add_inline_person(bot, query.message)
+        # bot.send_message(query.message.chat.id, "**Error**",  parse_mode='Markdown')
 
 
 # needed for stopping useless bot while adding a new person
