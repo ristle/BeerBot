@@ -57,7 +57,7 @@ def send_list(bot, message):
             if NAME in config.girls:
                 text += NAME + "* должна уже _" + str(iter) + "_. Бе)\n"
             else:
-                text += NAME + "* должен уже _" + str(iter) + "_\n"
+                text += NAME + "* должен уже _" + str(iter) + "_. Бе)\n"
         elif iter > 10:
             if NAME in config.girls:
                 text += NAME + "* обнаглела и должна _" + str(iter) + '_. Фиииии\n'
