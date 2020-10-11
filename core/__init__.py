@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import telebot
-import telepot
 import config
-import func
+import func as func
 from loguru import logger
 
 bot = telebot.TeleBot(config.TOKEN)
 logger.add(".logger.log", format="{time} {level} {message}", rotation="50 MB")
 
 
+@logger.catch()
 @bot.message_handler(commands=['start'])
 def start_command(message):
     bot.send_message(
@@ -19,6 +19,7 @@ def start_command(message):
 
 
 # for stupid
+@logger.catch()
 @bot.message_handler(commands=['help'])
 def help_command(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
@@ -47,6 +48,7 @@ def help_command(message):
 
 
 # /main function for lazy people
+@logger.catch()
 @bot.message_handler(commands=['main'])
 def exchange_command(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
@@ -67,6 +69,7 @@ def exchange_command(message):
 
 
 # needed for one line adding new beer
+@logger.catch()
 @bot.message_handler(commands=['add'])
 def exchange_command(message):
     config.NAME = None
@@ -77,6 +80,7 @@ def exchange_command(message):
 
 
 # needed for sending list by typing one command
+@logger.catch()
 @bot.message_handler(commands=['list'])
 def exchange_command(message):
     print(message.text)
@@ -85,6 +89,7 @@ def exchange_command(message):
 
 
 # main function for handle all keyboard
+@logger.catch()
 @bot.callback_query_handler(func=lambda call: True)
 def iq_callback(query):
     beers = config.load_beer_list()
@@ -97,7 +102,7 @@ def iq_callback(query):
     elif query.data == 'Добавить':
         config.NAME = None
         config.REMOVE_PERSON = False
-        if query.message.from_user.username not in config.trust_list:
+        if query.from_user.username not in config.trust_list:
             bot.send_message(query.message.chat.id, "У Вас нет прав на добавление")
             return
         func.send_inline_beer(bot, query.message)
