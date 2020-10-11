@@ -54,17 +54,17 @@ def send_list(bot, message):
     for name_, iter in beers.items():
         NAME = "*" + name_
         if iter and iter < 10:
-            if NAME in config.girls:
+            if name_ in config.girls:
                 text += NAME + "* должна уже _" + str(iter) + "_. Бе)\n"
             else:
-                text += NAME + "* должен уже _" + str(iter) + "_. Бе)\n"
-        elif iter > 10:
-            if NAME in config.girls:
+                text += NAME + "* должен уже _" + str(iter) + "_\n"
+        elif iter >= 10:
+            if name_ in config.girls:
                 text += NAME + "* обнаглела и должна _" + str(iter) + '_. Фиииии\n'
             else:
                 text += NAME + "* мало косячик, хотя должен уже _" + str(iter) + "_. Стоит призадуматься) \n"
         else:
-            if NAME in config.girls:
+            if name_ in config.girls:
                 text += NAME + "* паинька и не должна ничего _фи_\n"
             else:
                 text += NAME + "* паинька и не должен ничего\n"
